@@ -64,10 +64,10 @@ server.get("/users/:id", (req, res) => {
 });
 
 server.delete("/users/:id", (req, res) => {
-  const user = req.body;
+  const { id } = req.params;
 
   db("users")
-    .where(user)
+    .where({ id })
     .del()
     .then(user => {
       res.status(200).json(`${user} has been deleted`);
@@ -77,7 +77,24 @@ server.delete("/users/:id", (req, res) => {
     });
 });
 
+server.put("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const userEdit = req.body;
 
+  if (userEdit.name && userEdit.bio) {
+    db("users")
+      .where({ id })
+      .update(userEdit)
+      .then(user => {
+        res.status(200).json(`${user} has been updated`);
+      })
+    .catch (err => {
+      res.status(500).json({error: "failure to update user"})
+    })
+  } else {
+    res.status(400).json({error: "please provide name and bio for the user"})
+  }
+});
 
 server.listen(PORT, host, () => {
   console.log(`Listening at http://${host}:${PORT}`);
