@@ -1,7 +1,10 @@
 // implement your API here
 
 const express = require("express");
-let db = require("./data/db");
+// let db = require("./data/db");
+const knex = require("knex");
+const dbConfig = require("./knexfile");
+const db = knex(dbConfig.development);
 
 const server = express();
 
@@ -16,8 +19,35 @@ server.get("/", (req, res) => {
   res.json({ message: "Welcome to our API" });
 });
 
+server.post("/users", (req, res) => {
+  const newUser = {
+    id: String(db.length + 1),
+    name: req.body.name,
+    bio: req.body.bio
+  };
+
+  if (newUser.name && newUser.bio) {
+    db("users")
+      .insert(newUser)
+      .then(userId => {
+        res.status(201).json(newUser);
+      })
+      .catch(err => {
+        res.status(500).json({ error: "failed to create user" });
+      });
+  } else {
+    res.status(400).json({ error: "Please provide name and bio for the user" });
+  }
+});
+
 server.get("/users", (req, res) => {
-  res.json(db)
+  db("users")
+    .then(users => {
+      res.status(200).json(users);
+    })
+    .catch(err => {
+      res.status(500).json({ error: "failed to get users" });
+    });
 });
 
 server.listen(PORT, host, () => {
