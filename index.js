@@ -50,6 +50,21 @@ server.get("/users", (req, res) => {
     });
 });
 
+server.get("/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  db("users")
+    .where({ id })
+    .then(user => {
+      res.status(200).json(user);
+    })
+    .catch(err => {
+      res.status(500).json({ err: "failed to get user" });
+    });
+});
+
+server.delete
+
 server.listen(PORT, host, () => {
   console.log(`Listening at http://${host}:${PORT}`);
 });
