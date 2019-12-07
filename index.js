@@ -63,7 +63,21 @@ server.get("/users/:id", (req, res) => {
     });
 });
 
-server.delete
+server.delete("/users/:id", (req, res) => {
+  const user = req.body;
+
+  db("users")
+    .where(user)
+    .del()
+    .then(user => {
+      res.status(200).json(`${user} has been deleted`);
+    })
+    .catch(err => {
+      res.status(500).json({ error: "failed to delete user" });
+    });
+});
+
+
 
 server.listen(PORT, host, () => {
   console.log(`Listening at http://${host}:${PORT}`);
